@@ -1,0 +1,24 @@
+name: rogp
+
+dependencies:
+    - python=3.6
+    - numpy >= 1.7
+    - flake8
+    - scipy >= 0.17
+    - dill
+    - IPython
+    - jupyter
+    - plotly
+    - matplotlib
+    - pytest
+    - pytest-cov
+    - pip:
+        - GPy
+        - pyDOE
+        - pandas
+        - sklearn
+        - pyomo
+        - coordinates
+        - ipdb
+        - setuptools
+
