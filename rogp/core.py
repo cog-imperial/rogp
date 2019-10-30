@@ -1,6 +1,7 @@
 #!/usr/bin/env
 """core.py: build a robust GP-constrained pyomo model."""
 import numpy as np
+import pyomo.environ as p
 from . import kernels
 from . import plot
 
@@ -64,6 +65,40 @@ class ROGP():
 
     def predict(self, x):
         return self.predict_mu(x), self.predict_cov(x)
+
+    def warp(self, y):
+        """
+        Transform y with warping function
+
+        z = y*d + sum{a*tanh(b*(y + x))}
+        """
+        tanh = np.vectorize(p.tanh)
+        d = self.gp.warping_function.d
+        mpsi = self.gp.warping_function.psi
+
+        z = d * y.copy()
+        for i in range(len(mpsi)):
+            a, b, c = mpsi[i]
+            z += a * tanh(b * (y + c))
+        return z
+
+    def warp_deriv(self, y):
+        tanh = np.vectorize(p.tanh)
+        d = self.gp.warping_function.d
+        mpsi = self.gp.warping_function.psi
+
+        S = (mpsi[:, 1] * (y[:, :, None] + mpsi[:, 2])).T
+        R = tanh(S)
+        D = 1 - (R ** 2)
+
+        GRAD = (d + (mpsi[:, 0:1][:, :, None]
+                     * mpsi[:, 1:2][:, :, None]
+                     * D).sum(axis=0)).T
+
+        return GRAD
+
+
+
 
     def plot(self):
         plot.plot(self.gp)
