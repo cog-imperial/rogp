@@ -92,7 +92,7 @@ class ROGP():
         d = self.gp.warping_function.d
         mpsi = self.gp.warping_function.psi
 
-        z = d * y.copy()
+        z = d * y
         for i in range(len(mpsi)):
             a, b, c = mpsi[i]
             z += a * tanh(b * (y + c))
