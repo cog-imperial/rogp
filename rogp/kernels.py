@@ -49,5 +49,5 @@ class RBF(Kernel):
         :returns: squared exponential distance
         """
         r_sqr = self.euclidian_squared(x, y)/(self.lengthscale**2)
-        exp = np.vectorize(p.exp)
+        exp = np.vectorize(p.exp, otypes=[object])
         return self.variance * exp(-0.5 * r_sqr)
