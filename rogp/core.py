@@ -17,6 +17,10 @@ class ROGP():
     """
     def __init__(self, gp, kern='RBF', norm=None):
         self.gp = gp
+        if hasattr(gp, 'warping_function'):
+            self.warped = True
+        else:
+            self.warped = False
         self.norm = norm
         self.woodbury_vector = gp.posterior.woodbury_vector
         self.woodbury_inv = gp.posterior.woodbury_inv
@@ -35,15 +39,27 @@ class ROGP():
         mu = np.matmul(K_x_X, self.woodbury_vector)
         return mu
 
-    def predict_mu(self, x):
+    def predict_mu(self, x, z=None, cons=None):
         """ Predict mean from GP at x. """
+        # Make sure variable and cons list is provided if warped GP is used
+        if self.warped:
+            assert cons is not None and z is not None
         # Scale input
         x_norm = self.norm.X_norm.normalize(x)
         # Calculate mean
-        y_norm = self._predict_mu(x_norm)
-        # Unscale output
-        y = self.norm.Y_norm.inverse_mean(y_norm)
-        return y
+        y = self._predict_mu(x_norm)
+        if not self.warped:
+            # Unscale output
+            return self.norm.Y_norm.inverse_mean(y)
+        else:
+            # Scale in observation space
+            z_norm = self.norm.Y_norm.normalize(z)
+            # Set to prediction y in latent space
+            diff = self.warp(z_norm) - y
+            for d in np.nditer(diff, ['refs_ok']):
+                cons.add(d.item() == 0)
+            return z
+
 
     def _predict_cov(self, x):
         K_x_x = self.kern(x, x)
@@ -96,9 +112,6 @@ class ROGP():
                      * D).sum(axis=0)).T
 
         return GRAD
-
-
-
 
     def plot(self):
         plot.plot(self.gp)
