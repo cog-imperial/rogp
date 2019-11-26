@@ -60,14 +60,16 @@ class ROGP():
                 cons.add(d.item() == 0)
             return z
 
-
     def _predict_cov(self, x):
         K_x_x = self.kern(x, x)
         K_x_X = self.kern(x, self.X)
 
         # Sig = K_x_x - K_x_X*W_inv*K_X_x
-        return K_x_x - np.matmul(np.matmul(K_x_X, self.woodbury_inv),
-                                 K_x_X.T)
+        SIG = K_x_x - np.matmul(np.matmul(K_x_X, self.woodbury_inv),
+                                K_x_X.T)
+        SIG += np.diag(np.repeat(self.likelihood_variance,
+                                 x.shape[0]))
+        return SIG
 
     def predict_cov(self, x):
         """ Predict covariance between two points from GP. """
