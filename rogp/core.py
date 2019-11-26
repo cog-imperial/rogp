@@ -6,7 +6,7 @@ from . import kernels
 from . import plot
 
 
-class ROGP():
+class Standard():
     """
     Class for adding GP constraints from a GPy model to a Pyomo model.
 
@@ -17,10 +17,6 @@ class ROGP():
     """
     def __init__(self, gp, kern='RBF', norm=None):
         self.gp = gp
-        if hasattr(gp, 'warping_function'):
-            self.warped = True
-        else:
-            self.warped = False
         self.norm = norm
         self.woodbury_vector = gp.posterior.woodbury_vector
         self.woodbury_inv = gp.posterior.woodbury_inv
@@ -41,24 +37,12 @@ class ROGP():
 
     def predict_mu(self, x, z=None, cons=None):
         """ Predict mean from GP at x. """
-        # Make sure variable and cons list is provided if warped GP is used
-        if self.warped:
-            assert cons is not None and z is not None
         # Scale input
         x_norm = self.norm.x.normalize(x)
         # Calculate mean
         y = self._predict_mu(x_norm)
-        if not self.warped:
-            # Unscale output
-            return self.norm.y.inverse_mean(y)
-        else:
-            # Scale in observation space
-            z_norm = self.norm.y.normalize(z)
-            # Set to prediction y in latent space
-            diff = self.warp(z_norm) - y
-            for d in np.nditer(diff, ['refs_ok']):
-                cons.add(d.item() == 0)
-            return z
+        # Unscale output
+        return self.norm.y.inverse_mean(y)
 
     def _predict_cov(self, x):
         K_x_x = self.kern(x, x)
@@ -84,6 +68,19 @@ class ROGP():
     def predict(self, x):
         return self.predict_mu(x), self.predict_cov(x)
 
+    def plot(self):
+        plot.plot(self.gp)
+
+
+class Warped(Standard):
+    """
+    Class for adding GP constraints from a GPy model to a Pyomo model.
+
+    :param gp: GPy.models.gp_regression.WarpedGP object
+    :param kern: type of kernel function to use
+    :type kern: str
+
+    """
     def warp(self, y):
         """
         Transform y with warping function
@@ -115,5 +112,16 @@ class ROGP():
 
         return GRAD
 
-    def plot(self):
-        plot.plot(self.gp)
+    def predict_mu(self, x, z, cons):
+        """ Predict mean from GP at x. """
+        # Scale input
+        x_norm = self.norm.x.normalize(x)
+        # Calculate mean
+        y = self._predict_mu(x_norm)
+        # Scale in observation space
+        z_norm = self.norm.y.normalize(z)
+        # Set to prediction y in latent space
+        diff = self.warp(z_norm) - y
+        for d in np.nditer(diff, ['refs_ok']):
+            cons.add(d.item() == 0)
+        return z
