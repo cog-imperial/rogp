@@ -45,15 +45,15 @@ class ROGP():
         if self.warped:
             assert cons is not None and z is not None
         # Scale input
-        x_norm = self.norm.X_norm.normalize(x)
+        x_norm = self.norm.x.normalize(x)
         # Calculate mean
         y = self._predict_mu(x_norm)
         if not self.warped:
             # Unscale output
-            return self.norm.Y_norm.inverse_mean(y)
+            return self.norm.y.inverse_mean(y)
         else:
             # Scale in observation space
-            z_norm = self.norm.Y_norm.normalize(z)
+            z_norm = self.norm.y.normalize(z)
             # Set to prediction y in latent space
             diff = self.warp(z_norm) - y
             for d in np.nditer(diff, ['refs_ok']):
@@ -74,11 +74,11 @@ class ROGP():
     def predict_cov(self, x):
         """ Predict covariance between two points from GP. """
         # Scale inputs
-        x = self.norm.X_norm.normalize(x)
+        x = self.norm.x.normalize(x)
         # Calculate covariance
         cov_norm = self._predict_cov(x)
         # Unscale output
-        cov = self.norm.Y_norm.inverse_variance(cov_norm)
+        cov = self.norm.y.inverse_variance(cov_norm)
         return cov
 
     def predict(self, x):

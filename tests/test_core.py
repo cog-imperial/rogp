@@ -43,7 +43,7 @@ def wgp(scope='module'):
                           lengthscale=1.)
     gp = GPy.models.WarpedGP(X, Y, kernel=kernel,
                              warping_terms=2)
-    rogp = rogp.ROGP(gp, norm=norm)
+    rogp = rogp.Standard(gp, norm=norm)
 
     return rogp
 

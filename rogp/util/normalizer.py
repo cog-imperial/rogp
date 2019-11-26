@@ -8,27 +8,27 @@ class Normalizer:
     outputs
 
     Args:
-        X_norm: normalizer for inputs
-        Y_norm: normalizer for outputs
+        x: normalizer for inputs
+        y: normalizer for outputs
 
         both default to GPy.util.normalizer.Standardize()
 
     """
-    def __init__(self, X_norm=None, Y_norm=None):
+    def __init__(self, x=None, y=None):
         # Default normalizers
-        if X_norm is None:
-            X_norm = GPy.util.normalizer.Standardize()
-        if Y_norm is None:
-            Y_norm = GPy.util.normalizer.Standardize()
-        self.X_norm = X_norm
-        self.Y_norm = Y_norm
+        if x is None:
+            x = GPy.util.normalizer.Standardize()
+        if y is None:
+            y = GPy.util.normalizer.Standardize()
+        self.x = x
+        self.y = y
 
     def scale_by(self, X, Y):
-        self.X_norm.scale_by(X)
-        self.Y_norm.scale_by(Y)
+        self.x.scale_by(X)
+        self.y.scale_by(Y)
 
     def normalize(self, X, Y):
-        return self.X_norm.normalize(X), self.Y_norm.normalize(Y)
+        return self.x.normalize(X), self.y.normalize(Y)
 
 
 class IdentityNorm():
