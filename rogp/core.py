@@ -1,5 +1,6 @@
 #!/usr/bin/env
 """core.py: build a robust GP-constrained pyomo model."""
+import warnings
 import numpy as np
 import pyomo.environ as p
 from . import kernels
@@ -81,7 +82,7 @@ class Warped(Standard):
     :type kern: str
 
     """
-    def warp(self, y):
+    def _warp(self, y):
         """
         Transform y with warping function
 
@@ -97,7 +98,12 @@ class Warped(Standard):
             z += a * tanh(b * (y + c))
         return z
 
-    def warp_deriv(self, y):
+    def warp(self, y):
+        # Scale input
+        y_norm = self.norm.y.normalize(y)
+        return self._warp(y_norm)
+
+    def _warp_deriv(self, y):
         tanh = np.vectorize(p.tanh)
         d = self.gp.warping_function.d
         mpsi = self.gp.warping_function.psi
@@ -112,6 +118,11 @@ class Warped(Standard):
 
         return GRAD
 
+    def warp_deriv(self, y):
+        # Scale input
+        y_norm = self.norm.y.normalize(y)
+        return self._warp_deriv(y_norm)
+
     def predict_mu(self, x, z, cons):
         """ Predict mean from GP at x. """
         # Scale input
@@ -125,3 +136,30 @@ class Warped(Standard):
         for d in np.nditer(diff, ['refs_ok']):
             cons.add(d.item() == 0)
         return z
+
+    def predict_mu_latent(self, x):
+        """ Predict mean from GP at x in latent space (normalized). """
+        # Scale input
+        x_norm = self.norm.x.normalize(x)
+        # Calculate mean
+        y = self._predict_mu(x_norm)
+        return y
+
+    def predict_cov_latent(self, x):
+        """ Predict covariance between two points from GP. """
+        # Scale inputs
+        x = self.norm.x.normalize(x)
+        # Calculate covariance
+        cov = self._predict_cov(x)
+        return cov
+
+    def predict_latent(self, x):
+        return self.predict_mu_latent(x), self.predict_cov_latent(x)
+
+    def predict(self, x, z, cons):
+        return self.predict_mu(x, z, cons)
+
+    def predict_cov(self, x):
+        warnings.warn("Cant predict variance in observation space."
+                      " Predicting in latent space instead")
+        return self.predict_cov_latent(x)
