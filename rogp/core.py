@@ -123,27 +123,25 @@ class Warped(Standard):
         y_norm = self.norm.y.normalize(y)
         return self._warp_deriv(y_norm)
 
-    def predict_mu(self, x, z, cons):
+    def predict_mu(self, x, y, cons):
         """ Predict mean from GP at x. """
         # Scale input
         x_norm = self.norm.x.normalize(x)
         # Calculate mean
-        y = self._predict_mu(x_norm)
-        # Scale in observation space
-        z_norm = self.norm.y.normalize(z)
+        z = self._predict_mu(x_norm)
         # Set to prediction y in latent space
-        diff = self.warp(z_norm) - y
+        diff = self.warp(y) - z
         for d in np.nditer(diff, ['refs_ok']):
             cons.add(d.item() == 0)
-        return z
+        return y
 
     def predict_mu_latent(self, x):
         """ Predict mean from GP at x in latent space (normalized). """
         # Scale input
         x_norm = self.norm.x.normalize(x)
         # Calculate mean
-        y = self._predict_mu(x_norm)
-        return y
+        z = self._predict_mu(x_norm)
+        return z
 
     def predict_cov_latent(self, x):
         """ Predict covariance between two points from GP. """

@@ -50,14 +50,15 @@ def wgp(scope='module'):
 class TestWarping:
 
     def test_warping_numeric(self, wgp):
-        Y = np.random.uniform(size=(5, 1))
-        Z_rogp = wgp.warp(Y)
-        Z_gpy = wgp.gp.warping_function.f(Y)
+        y_norm = np.random.uniform(size=(5, 1), low=-1., high=1.)
+        y = wgp.norm.y.inverse_mean(y_norm)
+        Z_rogp = wgp.warp(y)
+        Z_gpy = wgp.gp.warping_function.f(y_norm)
 
         assert np.all(Z_rogp == Z_gpy)
 
-        GRAD_rogp = wgp.warp_deriv(Y)
-        GRAD_gpy = wgp.gp.warping_function.fgrad_y(Y)
+        GRAD_rogp = wgp.warp_deriv(y)
+        GRAD_gpy = wgp.gp.warping_function.fgrad_y(y_norm)
 
         assert np.all(GRAD_rogp == GRAD_gpy)
 
