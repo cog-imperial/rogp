@@ -10,12 +10,22 @@ def _to_np_obj_array(x):
     return X
 
 
-def _pyomo_to_np(X, ind=None):
-    if ind is None:
-        XX = [[x] for _, x in X.items()]
+def _eval(x, evaluate):
+    if evaluate:
+        return x()
     else:
-        XX = [[X[i]] for i in ind]
-    return _to_np_obj_array(XX)
+        return x
+
+
+def _pyomo_to_np(X, ind=None, evaluate=False):
+    if ind is None:
+        XX = [[_eval(x, evaluate)] for _, x in X.items()]
+    else:
+        XX = [[_eval(X[i], evaluate)] for i in ind]
+    if evaluate:
+        return np.array(XX).astype('float')
+    else:
+        return _to_np_obj_array(XX)
 
 
 def _eval_p(X, ind=None):
