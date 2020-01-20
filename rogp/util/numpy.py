@@ -1,5 +1,6 @@
 #!/usr/bin/env
 import numpy as np
+import pyomo.environ as p
 
 
 # TODO: Generalize to higher dimension
@@ -33,3 +34,7 @@ def _eval_p(X, ind=None):
         return [x() for _, x in X.items()]
     else:
         return [X[i]() for i in ind]
+
+
+def tanh(x):
+    return (p.exp(2*x) - 1) / (p.exp(2*x) + 1)

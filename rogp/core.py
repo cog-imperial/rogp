@@ -5,6 +5,7 @@ import numpy as np
 import pyomo.environ as p
 from . import kernels
 from . import plot
+from . import util
 
 
 class Standard():
@@ -82,20 +83,29 @@ class Warped(Standard):
     :type kern: str
 
     """
+    def __init__(self, gp, kern='RBF', norm=None, tanh=True):
+        super().__init__(gp, kern=kern, norm=norm)
+        self.set_tanh(tanh)
+
+    def set_tanh(self, tanh):
+        if tanh:
+            self.tanh = np.vectorize(p.tanh)
+        else:
+            self.tanh = np.vectorize(util.numpy.tanh)
+
     def _warp(self, y):
         """
         Transform y with warping function
 
         z = y*d + sum{a*tanh(b*(y + x))}
         """
-        tanh = np.vectorize(p.tanh)
         d = self.gp.warping_function.d
         mpsi = self.gp.warping_function.psi
 
         z = d * y
         for i in range(len(mpsi)):
             a, b, c = mpsi[i]
-            z += a * tanh(b * (y + c))
+            z += a * self.tanh(b * (y + c))
         return z
 
     def warp(self, y):
@@ -104,12 +114,11 @@ class Warped(Standard):
         return self._warp(y_norm)
 
     def _warp_deriv(self, y):
-        tanh = np.vectorize(p.tanh)
         d = self.gp.warping_function.d
         mpsi = self.gp.warping_function.psi
 
         S = (mpsi[:, 1] * (y[:, :, None] + mpsi[:, 2])).T
-        R = tanh(S)
+        R = self.tanh(S)
         D = 1 - (R ** 2)
 
         GRAD = (d + (mpsi[:, 0:1][:, :, None]
