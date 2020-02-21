@@ -1,6 +1,7 @@
 #!/usr/bin/env
 """core.py: build a robust GP-constrained pyomo model."""
 import warnings
+import scipy.optimize
 import numpy as np
 import pyomo.environ as p
 from . import kernels
@@ -86,6 +87,7 @@ class Warped(Standard):
     def __init__(self, gp, kern='RBF', norm=None, tanh=True):
         super().__init__(gp, kern=kern, norm=norm)
         self.set_tanh(tanh)
+        self._warp_inv = np.vectorize(self._warp_inv_scalar)
 
     def set_tanh(self, tanh):
         if tanh:
@@ -131,6 +133,24 @@ class Warped(Standard):
         # Scale input
         y_norm = self.norm.y.normalize(y)
         return self._warp_deriv(y_norm)
+
+    def _warp_inv_scalar(self, xi, bracket=(-2.5, 2.5)):
+        def f(y, xi):
+            return self._warp(np.array([[y]])) - xi
+        try:
+            res = scipy.optimize.root_scalar(f, xi, bracket=bracket)
+        except:
+            import ipdb; ipdb.set_trace()
+        return res.root
+
+    def warp_inv(self, xi):
+        y_norm = self._warp_inv(xi)
+        return self.norm.y.inverse_mean(y_norm)
+
+    def warp_inv_scalar(self, xi, bracket):
+        bracket = tuple(self.norm.y.normalize(bracket))
+        y_norm = self._warp_inv_scalar(xi, bracket)
+        return self.norm.y.inverse_mean(y_norm)
 
     def predict_mu(self, x, y, cons):
         """ Predict mean from GP at x. """
