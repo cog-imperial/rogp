@@ -2,9 +2,8 @@ name: rogp
 
 dependencies:
     - python=3.6
-    - numpy >= 1.7
+    - numpy
     - flake8
-    - scipy >= 0.17
     - dill
     - IPython
     - jupyter
