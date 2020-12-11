@@ -7,5 +7,6 @@ setup(
     author='Johannes Wiebe',
     author_email='j.wiebe17@imperial.ac.uk',
     packages=['rogp'],
-    install_requires=['GPy','pyomo','numpy','scipy','pandas', 'matplotlib']
+    install_requires=['GPy','pyomo','numpy','scipy','pandas', 'matplotlib',
+                      'plotly']
 )
