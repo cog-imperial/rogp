@@ -1,2 +1,2 @@
-from .util.normalizer import Normalizer
+from .util import Normalizer
 from .core import Standard, Warped, from_gpy
