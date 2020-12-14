@@ -4,9 +4,9 @@ import warnings
 import scipy.optimize
 import numpy as np
 import pyomo.environ as p
-import rogp.kernels as kernels
-import rogp.plot as plot
-import rogp.util as util
+from rogp import kernels
+from rogp import plot
+from rogp import util
 
 
 class Standard():
