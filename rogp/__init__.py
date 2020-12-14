@@ -1,3 +1,2 @@
-from rogp import util
-from rogp.util.normalizer import Normalizer
-from rogp.core import Standard, Warped, from_gpy
+from .util.normalizer import Normalizer
+from .core import Standard, Warped, from_gpy
