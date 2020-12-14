@@ -190,3 +190,10 @@ class Warped(Standard):
         warnings.warn("Cant predict variance in observation space."
                       " Predicting in latent space instead")
         return self.predict_cov_latent(x)
+
+
+def from_gpy(gp, kern='RBF', norm=None):
+    if hasattr(gp, 'warping_function'):
+        return Warped(gp, kern=kern, norm=norm)
+    else:
+        return Standard(gp, kern=kern, norm=norm)
