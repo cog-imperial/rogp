@@ -18,6 +18,10 @@ def _eval(x, evaluate):
         return x
 
 
+def pyomo_to_np(X, ind=None, evaluate=False):
+    return _pyomo_to_np(X, ind=ind, evaluate=evaluate)
+
+
 def _pyomo_to_np(X, ind=None, evaluate=False):
     if ind is None:
         XX = [[_eval(x, evaluate)] for _, x in X.items()]
