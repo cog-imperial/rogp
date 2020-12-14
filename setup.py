@@ -6,7 +6,7 @@ setup(
     version='0.1dev',
     author='Johannes Wiebe',
     author_email='j.wiebe17@imperial.ac.uk',
-    packages=['rogp'],
-    install_requires=['GPy','pyomo','numpy','scipy','pandas', 'matplotlib',
+    packages=find_packages(),
+    install_requires=['GPy', 'pyomo', 'numpy', 'scipy', 'pandas', 'matplotlib',
                       'plotly']
 )
