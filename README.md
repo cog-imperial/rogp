@@ -6,6 +6,10 @@ following paper:
 [A robust approach to warped Gaussian process-constrained
 optimization](https://arxiv.org/abs/2006.08222)
 
+## Installation
+
+    python -m pip install git+https://github.com/johwiebe/rogp.git
+
 ## Usage
 
     # Normalize training set x, y
