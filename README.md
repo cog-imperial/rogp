@@ -17,6 +17,10 @@ If you use this tool, please cite our paper as:
           primaryClass={math.OC}
     }
 
+## Installation
+
+    python -m pip install git+https://github.com/johwiebe/rogp.git
+
 ## Usage
 
     # Normalize training set x, y
