@@ -6,6 +6,17 @@ following paper:
 [A robust approach to warped Gaussian process-constrained
 optimization](https://arxiv.org/abs/2006.08222)
 
+If you use this tool, please cite our paper as:
+
+    @misc{Wiebe2020robust,
+          title={A robust approach to warped Gaussian process-constrained optimization}, 
+          author={Johannes Wiebe and Inês Cecílio and Jonathan Dunlop and Ruth Misener},
+          year={2020},
+          eprint={2006.08222},
+          archivePrefix={arXiv},
+          primaryClass={math.OC}
+    }
+
 ## Usage
 
     # Normalize training set x, y
@@ -36,3 +47,5 @@ This work was funded by the Engineering \& Physical Sciences Research
 Council (EPSRC) Center for Doctoral Training in High Performance Embedded
 and Distributed Systems (EP/L016796/1) and an EPSRC/Schlumberger CASE
 studentship (EP/R511961/1, voucher 17000145).
+
+Author: Johannes Wiebe
