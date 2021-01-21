@@ -104,3 +104,27 @@ class TestPrediction:
         cov_gpy = gp.norm.y.inverse_variance(cov_gpy)
         assert np.all(mu_rogp == pytest.approx(mu_gpy))
         assert np.all(cov_rogp == pytest.approx(cov_gpy))
+
+
+class TestNoNormalization:
+
+    def test_wgp_no_normalization(self):
+        import json
+        import GPy
+
+        with open('tests/data_warped_gp.json', 'r') as f:
+            data = json.load(f)
+
+        X = np.array(data['X'])[:, None]
+        Y = np.array(data['Y'])[:, None]
+        norm = rogp.util.Normalizer()
+        norm.scale_by(X, Y)
+        X, Y = norm.normalize(X, Y)
+        kernel = GPy.kern.RBF(input_dim=X.shape[1], variance=1.,
+                              lengthscale=1.)
+        gp = GPy.models.WarpedGP(X, Y, kernel=kernel,
+                                 warping_terms=2)
+
+        wgp = rogp.from_gpy(gp)
+        wgp.predict_mu_latent(np.array([[3]]))
+        wgp.predict_cov_latent(np.array([[3], [1]]))

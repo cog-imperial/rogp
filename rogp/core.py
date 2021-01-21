@@ -9,6 +9,9 @@ from . import plot
 from . import util
 
 
+identity_norm = util.Normalizer(x=util.IdentityNorm(), y=util.IdentityNorm())
+
+
 class Standard():
     """
     Class for adding GP constraints from a GPy model to a Pyomo model.
@@ -18,7 +21,7 @@ class Standard():
     :type kern: str
 
     """
-    def __init__(self, gp, kern='RBF', norm=None):
+    def __init__(self, gp, kern='RBF', norm=identity_norm):
         self.gp = gp
         self.norm = norm
         self.woodbury_vector = gp.posterior.woodbury_vector
@@ -84,7 +87,7 @@ class Warped(Standard):
     :type kern: str
 
     """
-    def __init__(self, gp, kern='RBF', norm=None, tanh=True):
+    def __init__(self, gp, kern='RBF', norm=identity_norm, tanh=True):
         super().__init__(gp, kern=kern, norm=norm)
         self.set_tanh(tanh)
         self._warp_inv = np.vectorize(self._warp_inv_scalar)
@@ -140,7 +143,7 @@ class Warped(Standard):
         try:
             res = scipy.optimize.root_scalar(f, xi, bracket=bracket)
         except:
-            import ipdb; ipdb.set_trace()
+            raise RuntimeError("Failed to find root")
         return res.root
 
     def warp_inv(self, xi):
@@ -192,7 +195,7 @@ class Warped(Standard):
         return self.predict_cov_latent(x)
 
 
-def from_gpy(gp, kern='RBF', norm=None):
+def from_gpy(gp, kern='RBF', norm=identity_norm):
     if hasattr(gp, 'warping_function'):
         return Warped(gp, kern=kern, norm=norm)
     else:
