@@ -6,6 +6,8 @@ following paper:
 [A robust approach to warped Gaussian process-constrained
 optimization](https://arxiv.org/abs/2006.08222)
 
+Also see our [Youtube Video](https://www.youtube.com/watch?v=h3vSgbxpVzU) on this project.
+
 If you use this tool, please cite our paper as:
 
     @misc{Wiebe2020robust,
