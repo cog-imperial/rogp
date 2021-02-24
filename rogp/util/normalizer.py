@@ -41,5 +41,5 @@ class IdentityNorm():
     def inverse_mean(self, Y):
         return Y
 
-    def inverse_cov(self, Y):
+    def inverse_variance(self, Y):
         return Y
