@@ -195,8 +195,8 @@ class Warped(Standard):
         return self.predict_cov_latent(x)
 
 
-def from_gpy(gp, kern='RBF', norm=identity_norm):
+def from_gpy(gp, kern='RBF', norm=identity_norm, **kwargs):
     if hasattr(gp, 'warping_function'):
-        return Warped(gp, kern=kern, norm=norm)
+        return Warped(gp, kern=kern, norm=norm, **kwargs)
     else:
-        return Standard(gp, kern=kern, norm=norm)
+        return Standard(gp, kern=kern, norm=norm, **kwargs)
