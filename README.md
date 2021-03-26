@@ -25,27 +25,29 @@ If you use this tool, please cite our paper as:
 
 ## Usage
 
-    # Normalize training set x, y
-    norm = rogp.Normalizer()
-    norm.scale_by(x, y)
-    X, Y = norm.normalize(x, y)
+```python
+# Normalize training set x, y
+norm = rogp.Normalizer()
+norm.scale_by(x, y)
+X, Y = norm.normalize(x, y)
 
-    # Train GP using GPy
-    kernel = GPy.kern.RBF(input_dim=1, variance=1., lengthscale=1.)
-    gp = GPy.models.GPRegression(X, Y, kernel)
-    gp.optimize(messages=True)
+# Train GP using GPy
+kernel = GPy.kern.RBF(input_dim=1, variance=1., lengthscale=1.)
+gp = GPy.models.GPRegression(X, Y, kernel)
+gp.optimize(messages=True)
 
-    # Create ROGP object
-    gp = rogp.from_gpy(gp, norm=norm)
+# Create ROGP object
+gp = rogp.from_gpy(gp, norm=norm)
 
-    # Create Pyomo model and variable
-    m = pe.ConcreteModel()
-    m.x = pe.Var(range(n))
+# Create Pyomo model and variable
+m = pe.ConcreteModel()
+m.x = pe.Var(range(n))
 
-    # Generate Pyomo expressions
-    xvar = rogp.pyomo_to_np(m.x)
-    mu = gp.predict_mu(xvar)
-    cov = gp.predict_cov(xvar)
+# Generate Pyomo expressions
+xvar = rogp.pyomo_to_np(m.x)
+mu = gp.predict_mu(xvar)
+cov = gp.predict_cov(xvar)
+```
 
 
 ## Acknowledgements
