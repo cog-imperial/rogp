@@ -21,7 +21,7 @@ If you use this tool, please cite our paper as:
 
 ## Installation
 
-    python -m pip install git+https://github.com/johwiebe/rogp.git
+    python -m pip install git+https://github.com/cog-imperial/rogp.git
 
 ## Usage
 
